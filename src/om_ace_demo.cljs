@@ -43,9 +43,8 @@
     (html
      [:div
       [:button {:onClick #(put! editor-chan :save!)} "Save"]
-      (->editor-area data
-                     {:init-state
-                      {:editor-chan editor-chan}})])))
+      (->> {:init-state {:editor-chan editor-chan}}
+           (->editor-area data))])))
 
 (defcomponent app [data owner]
   (render [_]
