@@ -5,18 +5,17 @@
             [sablono.core :as html :refer-macros [html]])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
-(def *ace* (atom nil))
+(defn set-value! [ace value]
+  (let [cursor (.getCursorPositionScreen @ace)]
+    (.setValue @ace value cursor)))
 
-(defn set-value! [value]
-  (let [ace-instance (deref *ace*)
-        cursor       (.getCursorPositionScreen ace-instance)]
-    (.setValue ace-instance value cursor)))
 
-(defn change-handler [owner]
-  (om/set-state-nr! owner :edited-value
-                    (.getValue (deref *ace*))))
+(defn change-handler [owner ace]
+  (->> (.getValue @ace)
+       (om/set-state-nr! owner :edited-value)))
 
 (defcomponent editor-area [data owner]
+  (init-state [_] {:ace (atom nil)})
   (render [_]
     (html [:div#ace {:style {:height "400px"}}]))
   (will-mount [_]
@@ -28,15 +27,15 @@
                        (om/get-state owner :edited-value)]
               (om/update! data :value edited-value)))))))
   (did-mount [_]
-    (let [ace-instance (.edit js/ace
-                              (.getDOMNode owner))]
-      (reset! *ace* ace-instance)
+    (let [ace-instance (.edit js/ace (om/get-node owner))]
+      (-> (om/get-state owner :ace)
+          (reset! ace-instance))
       (.. ace-instance
           getSession
-          (on "change" #(change-handler owner)))
-      (set-value! (:value data))))
+          (on "change" #(change-handler owner (om/get-state owner :ace))))
+      (set-value! (om/get-state owner :ace) (:value data))))
   (will-update [_ next-data next-state]
-    (set-value! (:value next-data))))
+    (set-value! (om/get-state owner :ace) (:value next-data))))
 
 (defcomponent editor [data owner]
   (init-state [_] {:editor-chan (chan)})
@@ -44,9 +43,8 @@
     (html
      [:div
       [:button {:onClick #(put! editor-chan :save!)} "Save"]
-      (->editor-area data
-                     {:init-state
-                      {:editor-chan editor-chan}})])))
+      (->> {:init-state {:editor-chan editor-chan}}
+           (->editor-area data))])))
 
 (defcomponent app [data owner]
   (render [_]
