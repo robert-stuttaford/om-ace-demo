@@ -11,9 +11,9 @@
     (.setValue @ace value cursor)))
 
 
-(defn change-handler [owner]
-  (om/set-state-nr! owner :edited-value
-                    (.getValue (deref *ace*))))
+(defn change-handler [owner ace]
+  (->> (.getValue @ace)
+       (om/set-state-nr! owner :edited-value)))
 
 (defcomponent editor-area [data owner]
   (init-state [_] {:ace (atom nil)})
