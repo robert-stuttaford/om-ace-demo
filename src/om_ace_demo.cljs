@@ -6,11 +6,10 @@
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (def *ace* (atom nil))
+(defn set-value! [ace value]
+  (let [cursor (.getCursorPositionScreen @ace)]
+    (.setValue @ace value cursor)))
 
-(defn set-value! [value]
-  (let [ace-instance (deref *ace*)
-        cursor       (.getCursorPositionScreen ace-instance)]
-    (.setValue ace-instance value cursor)))
 
 (defn change-handler [owner]
   (om/set-state-nr! owner :edited-value
