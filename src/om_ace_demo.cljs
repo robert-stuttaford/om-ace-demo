@@ -17,6 +17,7 @@
                     (.getValue (deref *ace*))))
 
 (defcomponent editor-area [data owner]
+  (init-state [_] {:ace (atom nil)})
   (render [_]
     (html [:div#ace {:style {:height "400px"}}]))
   (will-mount [_]
