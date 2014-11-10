@@ -3,9 +3,9 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2280"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
-                 [om "0.7.1"]
-                 [sablono "0.2.20" :exclusions [com.facebook/react]]
-                 [prismatic/om-tools "0.3.0" :exclusions [org.clojure/clojure]]]
+                 [om "0.7.3"]
+                 [sablono "0.2.22" :exclusions [com.facebook/react]]
+                 [prismatic/om-tools "0.3.6" :exclusions [org.clojure/clojure]]]
   :plugins [[lein-cljsbuild "1.0.3"]]
   :cljsbuild
   {:builds
