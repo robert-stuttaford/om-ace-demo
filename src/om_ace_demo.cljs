@@ -28,15 +28,15 @@
                        (om/get-state owner :edited-value)]
               (om/update! data :value edited-value)))))))
   (did-mount [_]
-    (let [ace-instance (.edit js/ace
-                              (.getDOMNode owner))]
-      (reset! *ace* ace-instance)
+    (let [ace-instance (.edit js/ace (om/get-node owner))]
+      (-> (om/get-state owner :ace)
+          (reset! ace-instance))
       (.. ace-instance
           getSession
-          (on "change" #(change-handler owner)))
-      (set-value! (:value data))))
+          (on "change" #(change-handler owner (om/get-state owner :ace))))
+      (set-value! (om/get-state owner :ace) (:value data))))
   (will-update [_ next-data next-state]
-    (set-value! (:value next-data))))
+    (set-value! (om/get-state owner :ace) (:value next-data))))
 
 (defcomponent editor [data owner]
   (init-state [_] {:editor-chan (chan)})
